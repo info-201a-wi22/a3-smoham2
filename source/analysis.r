@@ -71,25 +71,20 @@ total_white_jail_pop <- national_data %>%
 
 white_jail_percentage <- (total_white_jail_pop/total_jail_population) * 100 
 
-# Calculate total number of black people in jail every year
-national_black_jail_pop <- national_data %>% 
+# Calculate total number of white and black people in jail every year
+national_jail_pop <- national_data %>% 
   drop_na(black_jail_pop) %>% 
   group_by(year) %>% 
-  summarise(total_black_jail_pop = sum(black_jail_pop))
+  summarise(total_black_jail_pop = sum(black_jail_pop), total_white_jail_pop = sum(white_jail_pop))
 
-# Calculate total number of white people in jail every year
-national_white_jail_pop <- national_data %>% 
-  drop_na(white_jail_pop) %>% 
-  group_by(year) %>% 
-  summarise(total_white_jail_pop = sum(white_jail_pop))
 
-national_black_jail_pop <- national_black_jail_pop %>% 
+national_jail_pop <- national_jail_pop %>% 
   mutate(new_black_jail_pop = total_black_jail_pop - lag(total_black_jail_pop))
 
-national_white_jail_pop <- national_black_jail_pop %>% 
+national_jail_pop <- national_jail_pop %>% 
   mutate(new_white_jail_pop = total_white_jail_pop - lag(total_white_jail_pop))
 
 window_size <- 7
-national_black_jail_pop <- moving_avg_counts(national_black_jail_pop, window_size)
-moving_avg_black_plot <- plot_moving_avg_jail_pop(national_black_jail_pop, window_size)
+national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
+moving_avg_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size)
 print(moving_avg_black_plot)
