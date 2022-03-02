@@ -110,9 +110,9 @@ plot_moving_avg_jail_pop <- function(national_data, window_size) {
   
   # We initialize the labels of the chart. Each of these labels
   # will be placed on the chart in standard positions
-  plot_x_axis <- ""
-  plot_y_axis <- ""
-  plot_title <- "United States Black Jail Population"
+  plot_x_axis <- "Year"
+  plot_y_axis <- "Jail Population"
+  plot_title <- "United States Black Jail Population Growth"
   plot_subtitle <- paste0(window_size, "- Year Avg Cumulative Black Jail Population Counts (1970-2018)")
   plot_alt <- "Incarceration Trends from 1970-2018 Data from The Vera Project."
   plot_caption <- paste0(
@@ -140,12 +140,12 @@ plot_moving_avg_jail_pop <- function(national_data, window_size) {
     # This is how to draw the curve. Size is the thickness of the line.
     # For standard names of colors, see: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
     geom_line(
-      color = "red",
+      color = "black",
       size = 0.75
     ) +
     
     # This is how to fill in under the curve
-    geom_area(fill = "black") +
+    geom_area(fill = "grey") +
     
     # %B, \n, and %Y are special characters for formatting dates
     # They refer to Month, newline (aka line break or <br>), and Year respectively

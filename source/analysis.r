@@ -84,7 +84,7 @@ national_jail_pop <- national_jail_pop %>%
 national_jail_pop <- national_jail_pop %>% 
   mutate(new_white_jail_pop = total_white_jail_pop - lag(total_white_jail_pop))
 
-window_size <- 7
+window_size <- 10
 national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
 moving_avg_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size)
 print(moving_avg_black_plot)
