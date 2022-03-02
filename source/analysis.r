@@ -1,70 +1,27 @@
 # Assignment Overview ----------------------------------------------------------------
-# Assignment 2: Incarceration
+# Assignment 3: Incarceration
 # 
 # (Acknowledgement: Vera Project https://github.com/vera-institute/incarceration-trends#documentation.)
 #
+# Introduction
 #
-# This figure shows a rough sketch of a "cumulative sum" time series. 
-#
-# A time series means data collected sequentially, usually at regular
-# time intervals; for example, every 15 minutes, every 24 hours, or 
-# some other appropriate unit of time. A "cumulative sum" means that
-# at each point something changes and that the time series is the sum
-# of all previous changes. 
-#
-# Each "x" in the figure represents a data point in a time series, 
-# with 1 being the earliest recording and N being the most recent. 
-# The y-axis, represents the cumulative sum of things being counted. 
-# Sometimes there are large changes, sometimes there are no changes. 
-#
-# When data is structured this way, the counts strictly increase. 
-# In other words, this relationship is, in theory, ALWAYS true:
-#     f(t+1) >= f(t)
-#
-# (In practice, there might be occasions when f(t+1) < f(t); for 
-# example, when data collection errors are corrected. Such 
-# declines, however, would indicate a problem of some kind - and,
-# ideally, one would want to update all necessary data points 
-# so that declines are never present.)
-#
-# In a cumulative sum time series, the most recent point is also 
-# the total count (objects made, tasks completed, events that 
-# have occurred, etc.).
-
-## 2.0 Introduction ----
-# In this assignment you will work with three datasets, each  
-# is a cumulative sum time series. The time interval is 
-# one day (24 hours) and two things are being recorded during
-# each daily interval: 
-#
-#     cases -  the number of COVID infections 
-#     deaths - the number of deaths due to COVID. 
-#
-# Further, the case and death counts are collected at three 
-# different geographic levels: 
-#     national    The U.S. Nation as a whole. 
-#     state       U.S. States (50 official U.S. States, plus District
-#                 of Columbia, plus other territories).
-#     county      Each state is divided into counties. There are around 3,000 
-#                 counties in the U.S. And, FYI, Washington State has 
-#                 39 counties.*
-#
-#                 *See County, United States (2022, January 25). In Wikipedia. 
-#                          https://en.wikipedia.org/wiki/County_(United_States)
-#
-# These geographic levels differ in granularity. A state is made up of 
-# counties and the nation as a whole is made of states.  Thus, in theory
-# the county data should add up to the state data and the state data should
-# add up to the national data. 
-#
-# The data for Assignment 2 come from the New York Times:  
-#     The New York Times. (2022). Coronavirus (Covid-19) Data in the 
-#          United States. Retrieved [January, 2022], 
-#          from https://github.com/nytimes/covid-19-data."
-#
-# The charts that you might have seen in the New York Times 
-# are created from this data: 
-#      https://www.nytimes.com/interactive/2021/us/covid-cases.html 
+# As you may know black people in this country are incarcerated at very high rates. The Vera Project, is volunteer run research project
+# that seeks to track, report, and most importantly visualize in a human readable format (e.g using graphs) the ways in which 
+# black people are incarcerated in this country. In this assignment I will seek the answer to the following questions about
+# the incarceration rate of black people using the Vera Projects data available here https://github.com/vera-institute/incarceration-trends#documentation.
+# 
+# 1. What county (County, State) has the most black people in jail as of the most recent year?
+#   a. This will be stored in county_highest_black_rate
+# 2. What is the percentage of total jail population vs the total number of black people jailed across all counties as of the most recent year?
+#   a. This will be stored in black_jail_ratio
+# 3. What is the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year?
+#   a. This will be stored in white_jail_ratio
+# 4. In the last 5 years (since the Trump Presidency) have the national rates of incarceration for black people gone up vs the last 10 years?
+#   a. This will be stored in last_5_years_black_rate
+# 5. What state has the lowest incarceration rate for black people
+#   a. This will be stored in state_lowest_black_rate
+# 6. What state has the highest incarceration rate for black people
+#   a. This will be stored in state_highest_black_rate
 
 # This will clear environment variables
 rm(list = ls())
@@ -74,13 +31,65 @@ setwd("~/a3-smoham2/source")
 # Load helper functions for data visualization
 source("helperfunctions.R")
 
-# 1.a Load the tidyverse and dyplr packages
-install.packages("tidyverse")
-library(tidyverse)
+# Load the tidyverse and dyplr packages
 install.packages("dplyr")
 library(dplyr)
-
+old.packages()
 # Loading data ------------------------------------------------------------
 national_data <- load_incarceration_trends()
 jail_jurisdiction_data <- load_incarceration_trends_jail_jurisdiction()
 
+# Add a location column to the data set to better understand what counties are related to each state
+national_data <- national_data %>%
+  mutate(location = paste(county_name, state, sep = ", "))
+
+# 1. What county (County, State) has the most black people in jail as of the most recent year?
+county_highest_black_rate <- national_data %>% 
+  filter(year == max(year)) %>% 
+  drop_na(black_jail_pop) %>% 
+  filter(black_jail_pop == max(black_jail_pop)) %>% 
+  pull(location)
+
+# 2. What is the percentage of total population vs the total number of black people jailed across all counties as of the most recent year?
+total_black_jail_pop <- national_data %>% 
+  filter(year == max(year)) %>% 
+  tally(black_jail_pop) %>% 
+  pull()
+
+total_jail_population <- national_data %>% 
+  filter(year == max(year)) %>% 
+  tally(total_jail_pop) %>% 
+  pull()
+
+black_jail_percentage <- (total_black_jail_pop/total_jail_population) * 100
+
+# 3. What is the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year?
+total_white_jail_pop <- national_data %>% 
+  filter(year == max(year)) %>% 
+  tally(white_jail_pop) %>% 
+  pull()
+
+white_jail_percentage <- (total_white_jail_pop/total_jail_population) * 100 
+
+# Calculate total number of black people in jail every year
+national_black_jail_pop <- national_data %>% 
+  drop_na(black_jail_pop) %>% 
+  group_by(year) %>% 
+  summarise(total_black_jail_pop = sum(black_jail_pop))
+
+# Calculate total number of white people in jail every year
+national_white_jail_pop <- national_data %>% 
+  drop_na(white_jail_pop) %>% 
+  group_by(year) %>% 
+  summarise(total_white_jail_pop = sum(white_jail_pop))
+
+national_black_jail_pop <- national_black_jail_pop %>% 
+  mutate(new_black_jail_pop = total_black_jail_pop - lag(total_black_jail_pop))
+
+national_white_jail_pop <- national_black_jail_pop %>% 
+  mutate(new_white_jail_pop = total_white_jail_pop - lag(total_white_jail_pop))
+
+window_size <- 7
+national_black_jail_pop <- moving_avg_counts(national_black_jail_pop, window_size)
+moving_avg_black_plot <- plot_moving_avg_jail_pop(national_black_jail_pop, window_size)
+print(moving_avg_black_plot)
