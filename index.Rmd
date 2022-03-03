@@ -1,0 +1,24 @@
+---
+title: 'Assignment 3: Data Visualization (incarceration)'
+author: "Sumaya Mohamud"
+date: "3/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+(Acknowledgement: Vera Project https://github.com/vera-institute/incarceration-trends#documentation.)
+
+As you may know black people in this country are incarcerated at very high rates. The Vera Project, is volunteer run research project that seeks to track, report, and most importantly visualize in a human readable format (e.g using graphs) the ways in which black people are incarcerated in this country. In this assignment I will seek the answer to the following questions about the incarceration rates of black people using the Vera Projects data available here https://github.com/vera-institute/incarceration-trends#documentation.
+
+To help understand how unfair the system is to black people I will try to identify the total amount of black people incarcerated in jails as of the most recent year (total_black_jail_pop). This will help me understand the scale in which were talking about. To further understand the skew of the system I will find the percentage of total jail population vs the total number of black people jailed across all counties as of the most recent year (black_jail_percentage). I want to juxtapose this information with the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year (white_jail_percentage). As you may know, only 13.4% of the U.S population is black while whites people make up 76.3%  (source: https://www.census.gov/quickfacts/fact/table/US/PST045221). 
+Given that black people are the minority I would expect a fair prison system to have the same distribution of race, however this may not be the case.I have read that southern states are more likely to jail black people because things like Jim Crow (https://www.ferris.edu/HTMLS/news/jimcrow/what.htm). The Vera Project has data categorized by census division such as "Pacific" and "East South Central" (source:https://github.com/vera-institute/incarceration-trends/blob/master/incarceration_trends-Codebook.pdf).
+To prove or disprove this I will find the division with the lowest incarceration percentage for black people (division_lowest_black_rate) as of the most recent year. I will also compare this to the division with the highest incarceration percentage (division_highest_black_rate) as of the most recent year. These variables will be the total population in the division divided by the total number of black jail population. 
+
+## Summary
+
+Write summary for ex  
