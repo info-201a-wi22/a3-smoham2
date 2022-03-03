@@ -22,14 +22,6 @@ load_incarceration_trends <- function() {
   return(df)
 }
 
-# Get the most recent jail jurisdiction trends for the united states
-load_incarceration_trends_jail_jurisdiction <- function() {
-  filename <- "https://raw.githubusercontent.com/vera-institute/incarceration-trends/master/incarceration_trends_jail_jurisdiction.csv"
-  df <- read.csv(filename, header = TRUE, stringsAsFactors = FALSE)
-  return(df)
-}
-
-
 # Data wrangling functions -----
 # This function computes rolling averages for the prison population counts. A rolling average has a window size.
 #
@@ -106,14 +98,14 @@ moving_avg_counts <- function(national_data, window_size = 7) {
 
 # This function creates a chart of the rolling averages of
 # black and white jail populations
-plot_moving_avg_jail_pop <- function(national_data, window_size) {
+plot_moving_avg_jail_pop <- function(national_data, window_size, race, column) {
   
   # We initialize the labels of the chart. Each of these labels
   # will be placed on the chart in standard positions
   plot_x_axis <- "Year"
-  plot_y_axis <- "Jail Population"
-  plot_title <- "United States Black Jail Population Growth"
-  plot_subtitle <- paste0(window_size, "- Year Avg Cumulative Black Jail Population Counts (1970-2018)")
+  plot_y_axis <- "Jail Population Growth"
+  plot_title <- paste0("United States ", race, " Jail Population Growth")
+  plot_subtitle <- paste0(window_size, "- Year Running Average ", race, " Jail Population Counts (1970-2018)")
   plot_alt <- "Incarceration Trends from 1970-2018 Data from The Vera Project."
   plot_caption <- paste0(
     "UW INFO 201 Assignment 3 .\n Data from:",
@@ -134,7 +126,7 @@ plot_moving_avg_jail_pop <- function(national_data, window_size) {
     #   (1) We need to turn the `date` string into a `date` data type
     #   (2) Note that x is the date dimension and y the counts
     
-    aes(x = as.Date(ISOdate(year, 1, 1)), y = rolling_avg_black_pop)
+    aes(x = as.Date(ISOdate(year, 1, 1)), y = column)
   ) +
     
     # This is how to draw the curve. Size is the thickness of the line.

@@ -8,20 +8,21 @@
 # As you may know black people in this country are incarcerated at very high rates. The Vera Project, is volunteer run research project
 # that seeks to track, report, and most importantly visualize in a human readable format (e.g using graphs) the ways in which 
 # black people are incarcerated in this country. In this assignment I will seek the answer to the following questions about
-# the incarceration rate of black people using the Vera Projects data available here https://github.com/vera-institute/incarceration-trends#documentation.
+# the incarceration rates of black people using the Vera Projects data available here https://github.com/vera-institute/incarceration-trends#documentation.
 # 
-# 1. What county (County, State) has the most black people in jail as of the most recent year?
-#   a. This will be stored in county_highest_black_rate
-# 2. What is the percentage of total jail population vs the total number of black people jailed across all counties as of the most recent year?
-#   a. This will be stored in black_jail_ratio
-# 3. What is the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year?
-#   a. This will be stored in white_jail_ratio
-# 4. In the last 5 years (since the Trump Presidency) have the national rates of incarceration for black people gone up vs the last 10 years?
-#   a. This will be stored in last_5_years_black_rate
-# 5. What state has the lowest incarceration rate for black people
-#   a. This will be stored in state_lowest_black_rate
-# 6. What state has the highest incarceration rate for black people
-#   a. This will be stored in state_highest_black_rate
+# To help understand how unfair the system is to black people I will try to identify the total amount of black people incarcerated in jails 
+# as of the most recent year (total_black_jail_pop). This will help me understand the scale in which were talking about. To further understand the skew of the system I will find the 
+# percentage of total jail population vs the total number of black people jailed across all counties as of the most recent year (black_jail_percentage). I want to juxtapose this 
+# information with the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year (white_jail_percentage). 
+# As you may know, only 13.4% of the U.S population is black while whites people make up 76.3%  (source: https://www.census.gov/quickfacts/fact/table/US/PST045221). 
+# Given that black people are the minority I would expect a fair prison system to have the same distribution of race, however this may not be the case.
+# I have read that southern states are more likely to jail black people because things like Jim Crow (https://www.ferris.edu/HTMLS/news/jimcrow/what.htm).
+# The Vera Project has data categorized by census division such as "Pacific" and "East South Central" (source: https://github.com/vera-institute/incarceration-trends/blob/master/incarceration_trends-Codebook.pdf).
+# To prove or disprove this I will find the division with the lowest incarceration percentage for black people (division_lowest_black_rate) as of the most recent year. 
+# I will also compare this to the division with the highest incarceration percentage (division_highest_black_rate) as of the most recent year. These variables will be the total population in the division 
+# divided by the total number of black jail population. 
+
+
 
 # This will clear environment variables
 rm(list = ls())
@@ -37,30 +38,28 @@ library(dplyr)
 old.packages()
 # Loading data ------------------------------------------------------------
 national_data <- load_incarceration_trends()
-jail_jurisdiction_data <- load_incarceration_trends_jail_jurisdiction()
 
 # Add a location column to the data set to better understand what counties are related to each state
 national_data <- national_data %>%
   mutate(location = paste(county_name, state, sep = ", "))
 
-# 1. What county (County, State) has the most black people in jail as of the most recent year?
-county_highest_black_rate <- national_data %>% 
-  filter(year == max(year)) %>% 
-  drop_na(black_jail_pop) %>% 
-  filter(black_jail_pop == max(black_jail_pop)) %>% 
-  pull(location)
-
-# 2. What is the percentage of total population vs the total number of black people jailed across all counties as of the most recent year?
+# 1. What is the total number of black people incarcerated in jail as of the most recent year?
+# To calculate this first we must filter the data to the most recent year.
+# Then we tally the total number of black people in local jails.
 total_black_jail_pop <- national_data %>% 
   filter(year == max(year)) %>% 
   tally(black_jail_pop) %>% 
   pull()
 
+# 2. What is the percentage of total population vs the total number of black people jailed across all counties as of the most recent year?
+
+# Calculates total number of people in jail as of the most recent year
 total_jail_population <- national_data %>% 
   filter(year == max(year)) %>% 
   tally(total_jail_pop) %>% 
   pull()
 
+# Divide the previously calculated black jail population by the new total jail population
 black_jail_percentage <- (total_black_jail_pop/total_jail_population) * 100
 
 # 3. What is the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year?
@@ -69,22 +68,66 @@ total_white_jail_pop <- national_data %>%
   tally(white_jail_pop) %>% 
   pull()
 
+# Divide the new total jail population by the previously calculated total jail population
 white_jail_percentage <- (total_white_jail_pop/total_jail_population) * 100 
+
+
+# 4. What is the census division with the lowest percentage of black people in jail
+division_lowest_black_rate <- national_data %>% 
+  # First we filter to the most recent year
+  filter(year == max(year)) %>% 
+  # Then we group by census division
+  group_by(division) %>% 
+  drop_na(total_jail_pop) %>% 
+  drop_na(black_jail_pop) %>% 
+  # Then we create two new columns to track the total amount people in jail and black people in jail
+  summarise(jail_pop = sum(total_jail_pop), total_black_jail_pop = sum(black_jail_pop)) %>% 
+  # We add a new column to track the percentage
+  mutate(black_ratio = (total_black_jail_pop/jail_pop) * 100) %>% 
+  # Then we filter to the lowest
+  filter(black_ratio == min(black_ratio)) %>% 
+  pull(division)
+  
+  
+# 5. What is the census division with the highest percentage of black people in jail
+division_highest_black_rate  <- national_data %>% 
+  # First we filter to the most recent year
+  filter(year == max(year)) %>% 
+  # Then we group by census division
+  group_by(division) %>% 
+  drop_na(total_jail_pop) %>% 
+  drop_na(black_jail_pop) %>% 
+  # Then we create two new columns to track the total amount people in jail and black people in jail
+  summarise(jail_pop = sum(total_jail_pop), total_black_jail_pop = sum(black_jail_pop)) %>% 
+  # We add a new column to track the percentage
+  mutate(black_ratio = (total_black_jail_pop/jail_pop) * 100) %>% 
+  # Then we filter to the lowest
+  filter(black_ratio == max(black_ratio)) %>% 
+  pull(division)
 
 # Calculate total number of white and black people in jail every year
 national_jail_pop <- national_data %>% 
+  drop_na(white_jail_pop) %>% 
   drop_na(black_jail_pop) %>% 
   group_by(year) %>% 
   summarise(total_black_jail_pop = sum(black_jail_pop), total_white_jail_pop = sum(white_jail_pop))
 
-
+# Adds a new column that tracks how many more black people were in jail every year
 national_jail_pop <- national_jail_pop %>% 
   mutate(new_black_jail_pop = total_black_jail_pop - lag(total_black_jail_pop))
 
+# Adds a new column that tracks how many more white people were in jail every year
 national_jail_pop <- national_jail_pop %>% 
   mutate(new_white_jail_pop = total_white_jail_pop - lag(total_white_jail_pop))
 
+# Shows black jail population growth over time 
 window_size <- 10
 national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
-moving_avg_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size)
+moving_avg_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size, "Black", national_jail_pop$rolling_avg_black_pop)
 print(moving_avg_black_plot)
+
+# Shows white jail population growth over time 
+window_size <- 10
+national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
+moving_avg_white_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size, "White", national_jail_pop$rolling_avg_white_pop)
+print(moving_avg_white_plot)
