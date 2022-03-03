@@ -4,7 +4,6 @@
 
 # Source: https://github.com/info-201a-wi22/a2-starter-smoham2/blob/main/a2-functions.R
 
-# install.packages("RcppRoll")
 library("tidyverse")
 library("RcppRoll")
 
@@ -13,6 +12,13 @@ library("RcppRoll")
 # Get the most recent national incarceration data from the Vera Project
 load_incarceration_trends <- function() {
   filename <- "https://raw.githubusercontent.com/vera-institute/incarceration-trends/master/incarceration_trends.csv"
+  df <- read.csv(filename, header = TRUE, stringsAsFactors = FALSE)
+  return(df)
+}
+
+# Get the most recent jail jurisdiction trends for the united states
+load_incarceration_trends_jail_jurisdiction <- function() {
+  filename <- "https://raw.githubusercontent.com/vera-institute/incarceration-trends/master/incarceration_trends_jail_jurisdiction.csv"
   df <- read.csv(filename, header = TRUE, stringsAsFactors = FALSE)
   return(df)
 }
@@ -94,7 +100,7 @@ plot_moving_avg_jail_pop_by_race <- function(national_data, window_size, race, c
     "UW INFO 201 Assignment 3 .\n Data from:",
     "The Vera Project. (2022). ",
     "Incarceration Trends\n",
-    "Data in the United States. Retrieved [January, 2022],\n",
+    "Data in the United States. Retrieved [Febuary, 2022],\n",
     "https://github.com/vera-institute/incarceration-trends#documentation."
   )
   
@@ -150,13 +156,13 @@ plot_moving_avg_jail_pop <- function(national_data, window_size) {
   plot_x_axis <- "Year"
   plot_y_axis <- "Jail Population Growth"
   plot_title <- "United States Black and White Jail Population Growth"
-  plot_subtitle <- paste0(window_size, "- Year Running Average of Black and White Jail Population Counts (1970-2020)")
+  plot_subtitle <- paste0(window_size, "- Year Running Average of Black and White Jail Population Counts (1970-2018)")
   plot_alt <- "Incarceration Trends from 1970-2018 Data from The Vera Project."
   plot_caption <- paste0(
     "UW INFO 201 Assignment 3 .\n Data from:",
     "The Vera Project. (2022). ",
     "Incarceration Trends\n",
-    "Data in the United States. Retrieved [January, 2022],\n",
+    "Data in the United States. Retrieved [Febuary, 2022],\n",
     "https://github.com/vera-institute/incarceration-trends#documentation."
   )
   

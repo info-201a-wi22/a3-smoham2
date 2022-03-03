@@ -32,12 +32,17 @@ setwd("~/a3-smoham2/source")
 # Load helper functions for data visualization
 source("helperfunctions.R")
 
-# Load the tidyverse and dyplr packages
+# Load packages
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("maps")
+library(maps)
 install.packages("dplyr")
 library(dplyr)
-old.packages()
+
 # Loading data ------------------------------------------------------------
 national_data <- load_incarceration_trends()
+jail_jurisdiction_data <- load_incarceration_trends_jail_jurisdiction()
 
 # Add a location column to the data set to better understand what counties are related to each state
 national_data <- national_data %>%
@@ -131,3 +136,50 @@ window_size <- 10
 national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
 moving_avg_white_and_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size)
 print(moving_avg_white_and_black_plot)
+
+
+# Map
+# Get county fips data
+data(county.fips)
+# Get county data and add new column to match the polyname 
+counties <- map_data("county") %>% 
+  mutate(polyname = paste(region, subregion, sep = ",")) %>% 
+  group_by(polyname) %>% 
+  summarise(long = min(long), lat = max(lat))
+# left join county data with county fips data
+counties <- left_join(counties, county.fips, by = "polyname")
+
+map_data <- left_join(national_data, counties, by = "fips") %>%  
+  filter(year == max(year))
+
+blank_theme <- theme_bw() +
+  theme(
+    axis.line = element_blank(),        # remove axis lines
+    axis.text = element_blank(),        # remove axis labels
+    axis.ticks = element_blank(),       # remove axis ticks
+    axis.title = element_blank(),       # remove axis titles
+    plot.background = element_blank(),  # remove gray background
+    panel.grid.major = element_blank(), # remove major grid lines
+    panel.grid.minor = element_blank(), # remove minor grid lines
+    panel.border = element_blank()      # remove border around plot
+  )
+
+ggplot(map_data) +
+  geom_polygon(
+    mapping = aes(x = long, y = lat, group = group, fill = black_jail_pop),
+    color = "white", # show state outlines
+    size = .1        # thinly stroked
+    ) +
+  coord_map() + # use a map-based coordinate system
+  scale_fill_distiller(palette = "RdPu") +
+  labs(fill = "Black Jail Population") +
+  blank_theme +
+  labs(
+    x = "",
+    y = "",
+    title = "Current Black Jail Populations Across Counties",
+    subtitle = "",
+    caption = "",
+    alt = ""
+  )
+
