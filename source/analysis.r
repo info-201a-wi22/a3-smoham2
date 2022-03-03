@@ -123,11 +123,11 @@ national_jail_pop <- national_jail_pop %>%
 # Shows black jail population growth over time 
 window_size <- 10
 national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
-moving_avg_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size, "Black", national_jail_pop$rolling_avg_black_pop)
+moving_avg_black_plot <- plot_moving_avg_jail_pop_by_race(national_jail_pop, window_size, "Black", national_jail_pop$rolling_avg_black_pop)
 print(moving_avg_black_plot)
 
 # Shows white jail population growth over time 
 window_size <- 10
 national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
-moving_avg_white_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size, "White", national_jail_pop$rolling_avg_white_pop)
-print(moving_avg_white_plot)
+moving_avg_white_and_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size)
+print(moving_avg_white_and_black_plot)
