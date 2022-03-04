@@ -1,5 +1,5 @@
 ---
-title: 'Assignment 3: Data Visualization (incarceration)'
+title: 'INFO 201 Assignment 3: Data Visualization (incarceration)'
 author: "Sumaya Mohamud"
 date: "3/3/2022"
 output: html_document
@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+source("source/analysis.R", local = knitr::knit_global())
 ```
 
 ## Introduction
@@ -15,10 +16,35 @@ knitr::opts_chunk$set(echo = TRUE)
 
 As you may know black people in this country are incarcerated at very high rates. The Vera Project, is volunteer run research project that seeks to track, report, and most importantly visualize in a human readable format (e.g using graphs) the ways in which black people are incarcerated in this country. In this assignment I will seek the answer to the following questions about the incarceration rates of black people using the Vera Projects data available here https://github.com/vera-institute/incarceration-trends#documentation.
 
-To help understand how unfair the system is to black people I will try to identify the total amount of black people incarcerated in jails as of the most recent year (total_black_jail_pop). This will help me understand the scale in which were talking about. To further understand the skew of the system I will find the percentage of total jail population vs the total number of black people jailed across all counties as of the most recent year (black_jail_percentage). I want to juxtapose this information with the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year (white_jail_percentage). As you may know, only 13.4% of the U.S population is black while whites people make up 76.3%  (source: https://www.census.gov/quickfacts/fact/table/US/PST045221). 
+To help understand how unfair the system is to black people I will try to identify the total amount of black people incarcerated in jails as of the most recent year. This will help me understand the scale in which were talking about. To further understand the skew of the system I will find the percentage of total jail population vs the total number of black people jailed across all counties as of the most recent year. I want to juxtapose this information with the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year. As you may know, only 13.4% of the U.S population is black while whites people make up 76.3%  (source: https://www.census.gov/quickfacts/fact/table/US/PST045221). 
 Given that black people are the minority I would expect a fair prison system to have the same distribution of race, however this may not be the case.I have read that southern states are more likely to jail black people because things like Jim Crow (https://www.ferris.edu/HTMLS/news/jimcrow/what.htm). The Vera Project has data categorized by census division such as "Pacific" and "East South Central" (source:https://github.com/vera-institute/incarceration-trends/blob/master/incarceration_trends-Codebook.pdf).
-To prove or disprove this I will find the division with the lowest incarceration percentage for black people (division_lowest_black_rate) as of the most recent year. I will also compare this to the division with the highest incarceration percentage (division_highest_black_rate) as of the most recent year. These variables will be the total population in the division divided by the total number of black jail population. 
+To prove or disprove this I will find the division with the lowest incarceration percentage for black people as of the most recent year. I will also compare this to the division with the highest incarceration percentage as of the most recent year. These variables will be the total population in the division divided by the total number of black jail population. 
 
 ## Summary
 
-Write summary for ex  
+The first question I came up with was about the total black population in jail . After researching, I found the number to be `r toString(total_black_jail_pop)` out of the total jail population which the value came out to `r toString(total_jail_population)`. Although multiple states have no reports on their jail populations data, which leads me to believe that there are an increased number of black people incarcerated than listed. Some states have an unreported amount of jail inmates which means that the number of black people incarcerated will increase because the total number of people incarcerated will also increase. The white population came out to be `r toString(total_white_jail_pop)` according to the data. I do also believe that there are more white people in jail because of the overall data that has not been updated since 2018. 
+For the US Census Division with lowest black prison population percentage, the data shows that the `r division_lowest_black_rate` division has the lowest percentage of black people incarcerated. 
+After finding out this data I’m curious as to whether or not the amount of black inmates will surpass the amount of white inmates given the fact that there are multiple states of unknown data.  For the division's highest black prison population percentage, the data shows that the `r division_highest_black_rate` has that greatest percentage. This proved my hypothesis that the South in general is jailing black people at disproportionate rates. 
+
+### Black jail population trend over time
+```{r, echo=FALSE}
+moving_avg_black_plot
+```
+
+This first graph displays black jail population growth overtime. Overall I saw a decrease in population growth to the point where it is now negative growth i.e a reduction in population. I think this can attributed to the orginization of people and non-profit organizations like The Vera Project shining a light on this issue. I realized there was a spike between years 1990 and the 2000’s. And then started to slowly decrease over time. I noticed some counties had missing data and I think it would have spiked a lot more if everyone had reported their data.
+
+### Black vs White jail population growth
+```{r, echo=FALSE}
+moving_avg_white_and_black_plot
+```
+
+
+For the second graph of I chose to compare white jail population vs black jail population growth over time. The most important piece of information I got from this is that black and whites are incaerated at similar rates however black people only make up 13.4% of the U.S population. I noticed similars spike between 1990 and 2000’s. And after the 2000’s they both spiked again.
+
+### Heat Map of Black jail population
+```{r, echo=FALSE}
+black_jail_map
+```
+
+Overall this map shows the current number of black prisoners across all reported counties in the U.S. The graph has shown me that southern California, Nevada, and Florida have a high concentrations of black prisoners. The map also showed me that the counties, mostly southern counties, have not put in any data. I believe these counties should be forced to report their data. 
+

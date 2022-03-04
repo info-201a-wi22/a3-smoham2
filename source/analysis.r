@@ -3,26 +3,6 @@
 # 
 # (Acknowledgement: Vera Project https://github.com/vera-institute/incarceration-trends#documentation.)
 #
-# Introduction
-#
-# As you may know black people in this country are incarcerated at very high rates. The Vera Project, is volunteer run research project
-# that seeks to track, report, and most importantly visualize in a human readable format (e.g using graphs) the ways in which 
-# black people are incarcerated in this country. In this assignment I will seek the answer to the following questions about
-# the incarceration rates of black people using the Vera Projects data available here https://github.com/vera-institute/incarceration-trends#documentation.
-# 
-# To help understand how unfair the system is to black people I will try to identify the total amount of black people incarcerated in jails 
-# as of the most recent year (total_black_jail_pop). This will help me understand the scale in which were talking about. To further understand the skew of the system I will find the 
-# percentage of total jail population vs the total number of black people jailed across all counties as of the most recent year (black_jail_percentage). I want to juxtapose this 
-# information with the percentage of total jail population vs the total number of white people jailed across all counties as of the most recent year (white_jail_percentage). 
-# As you may know, only 13.4% of the U.S population is black while whites people make up 76.3%  (source: https://www.census.gov/quickfacts/fact/table/US/PST045221). 
-# Given that black people are the minority I would expect a fair prison system to have the same distribution of race, however this may not be the case.
-# I have read that southern states are more likely to jail black people because things like Jim Crow (https://www.ferris.edu/HTMLS/news/jimcrow/what.htm).
-# The Vera Project has data categorized by census division such as "Pacific" and "East South Central" (source: https://github.com/vera-institute/incarceration-trends/blob/master/incarceration_trends-Codebook.pdf).
-# To prove or disprove this I will find the division with the lowest incarceration percentage for black people (division_lowest_black_rate) as of the most recent year. 
-# I will also compare this to the division with the highest incarceration percentage (division_highest_black_rate) as of the most recent year. These variables will be the total population in the division 
-# divided by the total number of black jail population. 
-
-
 
 # This will clear environment variables
 rm(list = ls())
@@ -33,12 +13,9 @@ setwd("~/a3-smoham2/source")
 source("helperfunctions.R")
 
 # Load packages
-install.packages("tidyverse")
-library(tidyverse)
-install.packages("maps")
-library(maps)
-install.packages("dplyr")
-library(dplyr)
+library("tidyverse")
+library("maps")
+library("dplyr")
 
 # Loading data ------------------------------------------------------------
 national_data <- load_incarceration_trends()
@@ -131,7 +108,7 @@ national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
 moving_avg_black_plot <- plot_moving_avg_jail_pop_by_race(national_jail_pop, window_size, "Black", national_jail_pop$rolling_avg_black_pop)
 print(moving_avg_black_plot)
 
-# Shows white jail population growth over time 
+# Shows white and black jail population growth over time 
 window_size <- 10
 national_jail_pop <- moving_avg_counts(national_jail_pop, window_size)
 moving_avg_white_and_black_plot <- plot_moving_avg_jail_pop(national_jail_pop, window_size)
@@ -143,9 +120,7 @@ print(moving_avg_white_and_black_plot)
 data(county.fips)
 # Get county data and add new column to match the polyname 
 counties <- map_data("county") %>% 
-  mutate(polyname = paste(region, subregion, sep = ",")) %>% 
-  group_by(polyname) %>% 
-  summarise(long = min(long), lat = max(lat))
+  mutate(polyname = paste(region, subregion, sep = ","))
 # left join county data with county fips data
 counties <- left_join(counties, county.fips, by = "polyname")
 
@@ -164,7 +139,7 @@ blank_theme <- theme_bw() +
     panel.border = element_blank()      # remove border around plot
   )
 
-ggplot(map_data) +
+black_jail_map <- ggplot(map_data) +
   geom_polygon(
     mapping = aes(x = long, y = lat, group = group, fill = black_jail_pop),
     color = "white", # show state outlines
